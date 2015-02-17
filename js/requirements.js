@@ -9,7 +9,7 @@ $(document).ready(function() {
         
         console.log( $('#summary').val() );
         
-        $('#requirements').append('<p>' + markdown.toHTML( $('#summary').val() ) + '</p>');
+        $('#requirements').append('<div class="panel panel-default"><div class="panel-body">' + markdown.toHTML( $('#summary').val() ) + '</div></div>');
     });
 
     $('#summary').bind('keydown', 'ctrl+return', function () {
