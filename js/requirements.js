@@ -1,4 +1,23 @@
 $(document).ready(function() {
+    var data = [];
+
+    var RequirementsList = React.createClass({
+        render: function() {
+            var requirements = this.props.data.map(function (requirement) {
+                return (
+                    <ReactBootstrap.Panel>
+                        <div dangerouslySetInnerHTML={{ __html: requirement.summary }}></div>
+                    </ReactBootstrap.Panel>
+                );
+            });
+
+            return (
+                <div className="container">
+                    {requirements}
+                </div>
+            );
+        }
+    });
 
     $('#summary').autosize();
     $('#tags').autosize();
@@ -8,8 +27,10 @@ $(document).ready(function() {
         event.preventDefault();
         
         console.log( $('#summary').val() );
-        
-        $('#requirements').append('<div class="panel panel-default"><div class="panel-body">' + markdown.toHTML( $('#summary').val() ) + '</div></div>');
+
+        data.push( { summary: markdown.toHTML( $('#summary').val() ) } );
+
+        React.render( <RequirementsList data={data} />, document.getElementById('requirements-list') );
     });
 
     $('#summary').bind('keydown', 'ctrl+return', function () {
