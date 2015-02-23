@@ -1,28 +1,36 @@
 $(document).ready(function() {
-    var data = [
+
+    var RequirementsCollection = [
         { summary: "First Header\n===\n\n* One\n* Two\n* Three" },
         { summary: "Second Header\n===\n\n* Four\n* Five\n* Six" }
     ];
 
     var RequirementsApp = React.createClass({
+        handleAdd: function(requirement) {
+            RequirementsCollection.push(requirement);
+            this.setProps(RequirementsCollection);
+        },
         render: function() {
             return (
-                <div className="container">
-                    <h1>Requirements App</h1>
-                    <div className="row">
-                        <div className="col-md-12">
-                            <AddRequirementButton />
-                        </div>
+                <div className="main-container">
+                    <div className="container">
+                        <ReactBootstrap.Panel>
+                            <AddRequirementButton handleAdd={this.handleAdd} requirements={this.props.requirements} />
+                        </ReactBootstrap.Panel>
                     </div>
+                    <RequirementsList data={this.props.requirements} />
                 </div>
             );
         }
     });
 
     var AddRequirementButton = React.createClass({
+        handleAdd: function(requirement) {
+            this.props.handleAdd(requirement);
+        },
         render: function() {
             return (
-                <ReactBootstrap.ModalTrigger modal={<RequirementEditorModal />}>
+                <ReactBootstrap.ModalTrigger modal={<RequirementEditorModal handleSave={this.handleAdd} requirements={this.props.requirements} />}>
                     <ReactBootstrap.Button bsStyle="primary" bsSize="large">Add Requirement</ReactBootstrap.Button>
                 </ReactBootstrap.ModalTrigger>
             );
@@ -30,19 +38,24 @@ $(document).ready(function() {
     });
 
     var RequirementEditorModal = React.createClass({
-        addRequirement: function() {
-            alert("DERP!")
+        handleSave: function() {
+            return this.props.handleSave();
+        },
+        handleSave: function() {
+            var requirement = { summary: this.refs.summary.getValue() };
+            this.props.handleSave(requirement);
+            this.props.onRequestHide();
         },
         render: function() {
             return (
-                <ReactBootstrap.Modal {...this.props} title="Add Requirement" animation={false} closeButton={false}>
+                <ReactBootstrap.Modal {...this.props} title="Add Requirement" animation={false}>
                     <div className="modal-body">
-                        <RequirementEditor />
+                        <ReactBootstrap.Input type="textarea" ref="summary" />
                     </div>
                     <div className="modal-footer">
                         <ReactBootstrap.ButtonToolbar>
                             <ReactBootstrap.Button onClick={this.props.onRequestHide}>Cancel</ReactBootstrap.Button>
-                            <ReactBootstrap.Button bsStyle="primary" onClick={this.addRequirement}>Add Requirement</ReactBootstrap.Button>
+                            <ReactBootstrap.Button bsStyle="primary" onClick={this.handleSave}>Add Requirement</ReactBootstrap.Button>
                         </ReactBootstrap.ButtonToolbar>
                     </div>
                 </ReactBootstrap.Modal>
@@ -50,22 +63,12 @@ $(document).ready(function() {
         }
     });
 
-    var RequirementEditor = React.createClass({
-        render: function() {
-            return (
-                <form>
-                    <ReactBootstrap.Input type="textarea" />
-                </form>
-            );
-        }
-    });
-/*
     var RequirementsList = React.createClass({
         render: function() {
             var requirements = this.props.data.map(function (requirement) {
                 return (
                     <ReactBootstrap.Panel>
-                        <div dangerouslySetInnerHTML={{ __html: requirement.summary }}></div>
+                        <div dangerouslySetInnerHTML={{ __html: markdown.toHTML( requirement.summary ) }}></div>
                     </ReactBootstrap.Panel>
                 );
             });
@@ -77,23 +80,10 @@ $(document).ready(function() {
             );
         }
     });
-*/
 
-    React.render( <RequirementsApp />, document.getElementById("requirements-app") );
-/*
-    $('#new-requirement-form').submit(function ( event ) {
-        console.log('Submitting new requirement');
-        event.preventDefault();
-        
-        console.log( $('#summary').val() );
+    React.render(
+        <RequirementsApp requirements={RequirementsCollection} />,
+        document.getElementById("requirements-app")
+    );
 
-        data.push( { summary: markdown.toHTML( $('#summary').val() ) } );
-
-        React.render( <RequirementsList data={data} />, document.getElementById('requirements-list') );
-    });
-
-    $('#summary').bind('keydown', 'ctrl+return', function () {
-        $('#new-requirement-form').submit();
-    });
-*/
 });
