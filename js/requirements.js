@@ -18,7 +18,7 @@ $(document).ready(function() {
                             <AddRequirementButton handleAdd={this.handleAdd} requirements={this.props.requirements} />
                         </ReactBootstrap.Panel>
                     </div>
-                    <RequirementsList data={this.props.requirements} />
+                    <RequirementsList requirements={this.props.requirements} />
                 </div>
             );
         }
@@ -65,9 +65,30 @@ $(document).ready(function() {
 
     var RequirementsList = React.createClass({
         render: function() {
-            var requirements = this.props.data.map(function (requirement) {
+            var requirements = this.props.requirements.map(function (requirement) {
+                var RequirementFooter = React.createClass({
+                    render: function() {
+                        return (
+                            <ReactBootstrap.ButtonToolbar>
+                                <ReactBootstrap.ButtonGroup>
+                                    <ReactBootstrap.OverlayTrigger placement="bottom" overlay={<ReactBootstrap.Tooltip>Edit</ReactBootstrap.Tooltip>}>
+                                        <ReactBootstrap.Button bsSize="small" disabled>
+                                            <ReactBootstrap.Glyphicon glyph="edit" />
+                                        </ReactBootstrap.Button>
+                                    </ReactBootstrap.OverlayTrigger>
+                                    <ReactBootstrap.OverlayTrigger placement="bottom" overlay={<ReactBootstrap.Tooltip>Delete</ReactBootstrap.Tooltip>}>
+                                        <ReactBootstrap.Button bsSize="small" disabled>
+                                            <ReactBootstrap.Glyphicon glyph="remove" />
+                                        </ReactBootstrap.Button>
+                                    </ReactBootstrap.OverlayTrigger>
+                                </ReactBootstrap.ButtonGroup>
+                            </ReactBootstrap.ButtonToolbar>
+                        );
+                    }
+                });
+
                 return (
-                    <ReactBootstrap.Panel>
+                    <ReactBootstrap.Panel footer={<RequirementFooter/>}>
                         <div dangerouslySetInnerHTML={{ __html: markdown.toHTML( requirement.summary ) }}></div>
                     </ReactBootstrap.Panel>
                 );
