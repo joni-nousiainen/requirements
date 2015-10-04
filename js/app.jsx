@@ -1,5 +1,6 @@
 var $ = require('jquery');
 var markdown = require('markdown').markdown;
+var md5 = require('md5');
 
 var React = require('react');
 
@@ -7,7 +8,8 @@ var Button = require('react-bootstrap').Button;
 var ButtonGroup = require('react-bootstrap').ButtonGroup;
 var ButtonToolbar = require('react-bootstrap').ButtonToolbar;
 var Glyphicon = require('react-bootstrap').Glyphicon;
-var ModalTrigger = require('react-bootstrap').ModalTrigger;
+var Input = require('react-bootstrap').Input;
+var Modal = require('react-bootstrap').Modal;
 var OverlayTrigger = require('react-bootstrap').OverlayTrigger;
 var Panel = require('react-bootstrap').Panel;
 var Tooltip = require('react-bootstrap').Tooltip;
@@ -17,7 +19,7 @@ var RequirementsCollection = [
     { summary: "Second Header\n===\n\n* Four\n* Five\n* Six" }
 ];
 
-var RequirementsApp = React.createClass({
+var App = React.createClass({
     handleAdd: function(requirement) {
         RequirementsCollection.push(requirement);
         this.setProps(RequirementsCollection);
@@ -37,40 +39,43 @@ var RequirementsApp = React.createClass({
 });
 
 var AddRequirementButton = React.createClass({
-    handleAdd: function(requirement) {
-        this.props.handleAdd(requirement);
+    getInitialState() {
+        return { showModal: false };
     },
-    render: function() {
-        return (
-            <ModalTrigger modal={<RequirementEditorModal handleSave={this.handleAdd} requirements={this.props.requirements} />}>
-                <Button bsStyle="primary" bsSize="large">Add Requirement</Button>
-            </ModalTrigger>
-        );
-    }
-});
 
-var RequirementEditorModal = React.createClass({
-    //handleSave: function() {
-    //    return this.props.handleSave();
-    //},
-    handleSave: function() {
-        var requirement = { summary: this.refs.summary.getValue() };
-        this.props.handleSave(requirement);
-        this.props.onRequestHide();
+    open() {
+        this.setState({ showModal: true });
     },
+
+    close() {
+        this.setState({ showModal: false });
+    },
+
+    handleAdd: function(requirement) {
+        var requirement = { summary: this.refs.summary.getValue() };
+        this.props.handleAdd(requirement);
+        this.close()
+    },
+
     render: function() {
         return (
-            <Modal {...this.props} title="Add Requirement" animation={false}>
-                <div className="modal-body">
-                    <Input type="textarea" ref="summary" />
-                </div>
-                <div className="modal-footer">
-                    <ButtonToolbar>
-                        <Button onClick={this.props.onRequestHide}>Cancel</Button>
-                        <Button bsStyle="primary" onClick={this.handleSave}>Add Requirement</Button>
-                    </ButtonToolbar>
-                </div>
-            </Modal>
+            <div>
+                <Button bsStyle="primary" bsSize="large" onClick={this.open}>Add Requirement</Button>
+                <Modal show={this.state.showModal} onHide={this.close}>
+                    <Modal.Header closeButton>
+                        <Modal.Title>Add Requirement</Modal.Title>
+                    </Modal.Header>
+                    <Modal.Body>
+                        <Input type="textarea" ref="summary" />
+                    </Modal.Body>
+                    <Modal.Footer>
+                        <ButtonToolbar>
+                            <Button onClick={this.close}>Cancel</Button>
+                            <Button bsStyle="primary" onClick={this.handleAdd}>Add Requirement</Button>
+                        </ButtonToolbar>
+                    </Modal.Footer>
+                </Modal>
+            </div>
         );
     }
 });
@@ -100,7 +105,7 @@ var RequirementsList = React.createClass({
             });
 
             return (
-                <Panel footer={<RequirementFooter/>}>
+                <Panel key={md5(requirement.summary)} footer={<RequirementFooter/>}>
                     <div dangerouslySetInnerHTML={{ __html: markdown.toHTML( requirement.summary ) }}></div>
                 </Panel>
             );
@@ -115,21 +120,6 @@ var RequirementsList = React.createClass({
 });
 
 React.render(
-    <RequirementsApp requirements={RequirementsCollection} />,
+    <App requirements={RequirementsCollection} />,
     document.getElementById("app")
 );
-
-/*
-var App = React.createClass({
-    render: function () {
-        return (
-            <div>Hello App!</div>
-        );
-    }
-});
-
-React.render(
-    <App />,
-    document.getElementById("app")
-);
-*/

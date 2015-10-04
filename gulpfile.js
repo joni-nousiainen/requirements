@@ -9,7 +9,6 @@ var webpackConfig = {
 
     output: {
         path: path.resolve('.', 'dist'),
-        publicPath: "/assets/",
         filename: 'bundle.js'
     },
 
@@ -17,8 +16,8 @@ var webpackConfig = {
         loaders: [
             {
                 test: /\.jsx?$/,
-                exclude: path.resolve('.', 'node_modules'),
-                loader: 'babel-loader'
+                loader: 'babel-loader',
+                exclude: path.resolve('.', 'node_modules')
             }
         ]
     }
@@ -50,7 +49,7 @@ gulp.task("webpack-dev-server", function(callback) {
     });
 });
 
-gulp.task('default', ['webpack:build-dev']);
+gulp.task('default', ['webpack-dev-server']);
 
 gulp.task('watch', function () {
     gulp.watch('js/*.jsx', ['webpack:build-dev']);
